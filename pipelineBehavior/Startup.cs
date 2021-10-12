@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using pipelineBehavior.Infra.Behavior;
 using pipelineBehavior.Infra.Exceptions;
 using pipelineBehavior.Validations;
+using System.Reflection;
 
 namespace pipelineBehavior
 {
@@ -23,10 +24,7 @@ namespace pipelineBehavior
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var presentationAssembly = typeof(Infra.AssemblyReference).Assembly;
-
-            services.AddControllers()
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(presentationAssembly));
+            services.AddControllers();
 
             services.AddSwaggerGen(c =>
             {
@@ -34,8 +32,11 @@ namespace pipelineBehavior
             });
 
             services.AddTransient<ExceptionHandlingMiddleware>();
-            services.AddMediatR(presentationAssembly);
-            services.AddTransient(typeof(IPipeline<,>), typeof(PipelineValidator<,>));
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PipelineValidator<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Logging<,>));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace pipelineBehavior.Infra.Behavior
 {
-    public sealed class PipelineValidator<TRequest, TResponse> : IPipeline<TRequest, TResponse>
+    public sealed class PipelineValidator<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : class, ICommand<TResponse>
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
